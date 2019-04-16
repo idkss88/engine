@@ -15,6 +15,7 @@ import android.view.Surface;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
+import io.flutter.embedding.android.FlutterView;
 import io.flutter.embedding.engine.FlutterJNI;
 import io.flutter.view.TextureRegistry;
 
@@ -49,14 +50,16 @@ public class FlutterRenderer implements TextureRegistry {
     }
 
     this.renderSurface = renderSurface;
+    this.renderSurface.attachToRenderer(this);
     this.flutterJNI.setRenderSurface(renderSurface);
   }
 
   public void detachFromRenderSurface() {
     // TODO(mattcarroll): determine desired behavior if we're asked to detach without first being attached
     if (this.renderSurface != null) {
-      surfaceDestroyed();
+      this.renderSurface.detachFromRenderer();
       this.renderSurface = null;
+      surfaceDestroyed();
       this.flutterJNI.setRenderSurface(null);
     }
   }
@@ -157,29 +160,19 @@ public class FlutterRenderer implements TextureRegistry {
   }
 
   // TODO(mattcarroll): describe the native behavior that this invokes
-  public void setViewportMetrics(float devicePixelRatio,
-                                 int physicalWidth,
-                                 int physicalHeight,
-                                 int physicalPaddingTop,
-                                 int physicalPaddingRight,
-                                 int physicalPaddingBottom,
-                                 int physicalPaddingLeft,
-                                 int physicalViewInsetTop,
-                                 int physicalViewInsetRight,
-                                 int physicalViewInsetBottom,
-                                 int physicalViewInsetLeft) {
+  public void setViewportMetrics(@NonNull ViewportMetrics viewportMetrics) {
     flutterJNI.setViewportMetrics(
-        devicePixelRatio,
-        physicalWidth,
-        physicalHeight,
-        physicalPaddingTop,
-        physicalPaddingRight,
-        physicalPaddingBottom,
-        physicalPaddingLeft,
-        physicalViewInsetTop,
-        physicalViewInsetRight,
-        physicalViewInsetBottom,
-        physicalViewInsetLeft
+        viewportMetrics.devicePixelRatio,
+        viewportMetrics.width,
+        viewportMetrics.height,
+        viewportMetrics.paddingTop,
+        viewportMetrics.paddingRight,
+        viewportMetrics.paddingBottom,
+        viewportMetrics.paddingLeft,
+        viewportMetrics.viewInsetTop,
+        viewportMetrics.viewInsetRight,
+        viewportMetrics.viewInsetBottom,
+        viewportMetrics.viewInsetLeft
     );
   }
 
@@ -241,7 +234,7 @@ public class FlutterRenderer implements TextureRegistry {
    * UI.
    *
    * A {@code RenderSurface} is responsible for carrying out behaviors that are needed by a
-   * corresponding {@link FlutterRenderer}, e.g., {@link #updateSemantics(ByteBuffer, String[])}.
+   * corresponding {@link FlutterRenderer}.
    *
    * A {@code RenderSurface} also receives callbacks for important events, e.g.,
    * {@link #onFirstFrameRendered()}.
@@ -263,12 +256,6 @@ public class FlutterRenderer implements TextureRegistry {
      */
     void detachFromRenderer();
 
-    // TODO(mattcarroll): describe what this callback is intended to do
-    void updateCustomAccessibilityActions(ByteBuffer buffer, String[] strings);
-
-    // TODO(mattcarroll): describe what this callback is intended to do
-    void updateSemantics(ByteBuffer buffer, String[] strings);
-
     /**
      * The {@link FlutterRenderer} corresponding to this {@code RenderSurface} has painted its
      * first frame since being initialized.
@@ -280,5 +267,37 @@ public class FlutterRenderer implements TextureRegistry {
      * never be called.
      */
     void onFirstFrameRendered();
+
+    /**
+     * Adds the given {@code listener} to this {@code FlutterRenderer}, to be notified upon Flutter's
+     * first rendered frame.
+     */
+    void addOnFirstFrameRenderedListener(@NonNull OnFirstFrameRenderedListener listener);
+
+    /**
+     * Removes the given {@code listener}, which was previously added with
+     * {@link #addOnFirstFrameRenderedListener(OnFirstFrameRenderedListener)}.
+     */
+    void removeOnFirstFrameRenderedListener(@NonNull OnFirstFrameRenderedListener listener);
+  }
+
+  /**
+   * Mutable data structure that holds all viewport metrics properties that Flutter cares about.
+   *
+   * All distance measurements, e.g., width, height, padding, viewInsets, are measured in device
+   * pixels, not logical pixels.
+   */
+  public static final class ViewportMetrics {
+    public float devicePixelRatio = 1.0f;
+    public int width = 0;
+    public int height = 0;
+    public int paddingTop = 0;
+    public int paddingRight = 0;
+    public int paddingBottom = 0;
+    public int paddingLeft = 0;
+    public int viewInsetTop = 0;
+    public int viewInsetRight = 0;
+    public int viewInsetBottom = 0;
+    public int viewInsetLeft = 0;
   }
 }

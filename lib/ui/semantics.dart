@@ -7,8 +7,9 @@ part of dart.ui;
 /// The possible actions that can be conveyed from the operating system
 /// accessibility APIs to a semantics node.
 //
-// When changes are made to this class, the equivalent APIs in each of the
-// embedders *must* be updated.
+// When changes are made to this class, the equivalent APIs in
+// `lib/ui/semantics/semantics_node.h` and in each of the embedders *must* be
+// updated.
 class SemanticsAction {
   const SemanticsAction._(this.index);
 
@@ -264,8 +265,9 @@ class SemanticsAction {
 
 /// A Boolean value that can be associated with a semantics node.
 //
-// When changes are made to this class, the equivalent APIs in each of the
-// embedders *must* be updated.
+// When changes are made to this class, the equivalent APIs in
+// `lib/ui/semantics/semantics_node.h` and in each of the embedders *must* be
+// updated.
 class SemanticsFlag {
   static const int _kHasCheckedStateIndex = 1 << 0;
   static const int _kIsCheckedIndex = 1 << 1;
@@ -476,9 +478,9 @@ class SemanticsFlag {
   /// to move focus to an offscreen child.
   ///
   /// For example, a [ListView] widget has implicit scrolling so that users can
-  /// easily move to the next visible set of children. A [TabBar] widget does
-  /// not have implicit scrolling, so that users can navigate into the tab
-  /// body when reaching the end of the tab bar.
+  /// easily move the accessibility focus to the next set of children. A
+  /// [PageView] widget does not have implicit scrolling, so that users don't
+  /// navigate to the next page when reaching the end of the current one.
   static const SemanticsFlag hasImplicitScrolling = const SemanticsFlag._(_kHasImplicitScrollingIndex);
 
   /// The possible semantics flags.
@@ -599,6 +601,11 @@ class SemanticsUpdateBuilder extends NativeFieldWrapperClass2 {
   /// The fields 'textSelectionBase' and 'textSelectionExtent' describe the
   /// currently selected text within `value`.
   ///
+  /// The field `platformViewId` references the platform view, whose semantics
+  /// nodes will be added as children to this node. If a platform view is
+  /// specified, `childrenInHitTestOrder` and `childrenInTraversalOrder` must be
+  /// empty.
+  ///
   /// For scrollable nodes `scrollPosition` describes the current scroll
   /// position in logical pixel. `scrollExtentMax` and `scrollExtentMin`
   /// describe the maximum and minimum in-rage values that `scrollPosition` can
@@ -627,6 +634,7 @@ class SemanticsUpdateBuilder extends NativeFieldWrapperClass2 {
     int actions,
     int textSelectionBase,
     int textSelectionExtent,
+    int platformViewId,
     int scrollChildren,
     int scrollIndex,
     double scrollPosition,
@@ -654,6 +662,7 @@ class SemanticsUpdateBuilder extends NativeFieldWrapperClass2 {
       actions,
       textSelectionBase,
       textSelectionExtent,
+      platformViewId,
       scrollChildren,
       scrollIndex,
       scrollPosition,
@@ -683,6 +692,7 @@ class SemanticsUpdateBuilder extends NativeFieldWrapperClass2 {
     int actions,
     int textSelectionBase,
     int textSelectionExtent,
+    int platformViewId,
     int scrollChildren,
     int scrollIndex,
     double scrollPosition,

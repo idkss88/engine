@@ -27,6 +27,8 @@ public class FlutterShellArgs {
   public static final String ARG_TRACE_STARTUP = "--trace-startup";
   public static final String ARG_KEY_START_PAUSED = "start-paused";
   public static final String ARG_START_PAUSED = "--start-paused";
+  public static final String ARG_KEY_ENABLE_SERVICE_AUTH_CODES = "enable-service-auth-codes";
+  public static final String ARG_ENABLE_SERVICE_AUTH_CODES = "--enable-service-auth-codes";
   public static final String ARG_KEY_USE_TEST_FONTS = "use-test-fonts";
   public static final String ARG_USE_TEST_FONTS = "--use-test-fonts";
   public static final String ARG_KEY_ENABLE_DART_PROFILING = "enable-dart-profiling";
@@ -37,6 +39,8 @@ public class FlutterShellArgs {
   public static final String ARG_SKIA_DETERMINISTIC_RENDERING = "--skia-deterministic-rendering";
   public static final String ARG_KEY_TRACE_SKIA = "trace-skia";
   public static final String ARG_TRACE_SKIA = "--trace-skia";
+  public static final String ARG_KEY_DUMP_SHADER_SKP_ON_SHADER_COMPILATION = "dump-skp-on-shader-compilation";
+  public static final String ARG_DUMP_SHADER_SKP_ON_SHADER_COMPILATION = "--dump-skp-on-shader-compilation";
   public static final String ARG_KEY_VERBOSE_LOGGING = "verbose-logging";
   public static final String ARG_VERBOSE_LOGGING = "--verbose-logging";
 
@@ -54,6 +58,11 @@ public class FlutterShellArgs {
     if (intent.getBooleanExtra(ARG_KEY_START_PAUSED, false)) {
       args.add(ARG_START_PAUSED);
     }
+    // TODO(bkonyi): when authentication codes are enabled by default, change
+    // to 'disable-service-auth-codes' instead of 'enable-service-auth-codes'.
+    if (intent.getBooleanExtra(ARG_KEY_ENABLE_SERVICE_AUTH_CODES, false)) {
+      args.add(ARG_ENABLE_SERVICE_AUTH_CODES);
+    }
     if (intent.getBooleanExtra(ARG_KEY_USE_TEST_FONTS, false)) {
       args.add(ARG_USE_TEST_FONTS);
     }
@@ -68,6 +77,9 @@ public class FlutterShellArgs {
     }
     if (intent.getBooleanExtra(ARG_KEY_TRACE_SKIA, false)) {
       args.add(ARG_TRACE_SKIA);
+    }
+    if (intent.getBooleanExtra(ARG_KEY_DUMP_SHADER_SKP_ON_SHADER_COMPILATION, false)) {
+      args.add(ARG_KEY_DUMP_SHADER_SKP_ON_SHADER_COMPILATION);
     }
     if (intent.getBooleanExtra(ARG_KEY_VERBOSE_LOGGING, false)) {
       args.add(ARG_VERBOSE_LOGGING);
